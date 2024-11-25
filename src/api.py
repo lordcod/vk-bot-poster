@@ -1,5 +1,4 @@
 import vk_api
-import os
 from vk_api import VkUpload
 
 
