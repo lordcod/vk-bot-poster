@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 import yaml
 import os
+from pathlib import Path
 from .tokenizer import get_token
 
-
-CONFIG_PATH = os.path.join(os.getcwd(), 'config.yaml')
-
+PARENT_PATH = Path(__file__).parent.parent
+CONFIG_PATH = os.path.join(PARENT_PATH, 'config.yaml')
+IMAGES_PATH = os.path.join(PARENT_PATH, 'images')
 
 def deploy_token(data: dict):
     token = data.get('token')

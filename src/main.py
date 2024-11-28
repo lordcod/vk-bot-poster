@@ -3,9 +3,8 @@ import time
 from datetime import datetime
 from loguru import logger
 from .api import WallPosterApi
-from .config import Config
+from .config import Config, IMAGES_PATH
 
-IMAGES_PATH = os.path.join(os.getcwd(), 'images')
 
 
 def get_sender(wpa: WallPosterApi, msg: str):
