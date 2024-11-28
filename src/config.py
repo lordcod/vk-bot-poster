@@ -26,9 +26,6 @@ class Config:
     hour: int
     minute: int
     delay: int
-    proxy: str | None
-    proxy_user: str | None
-    proxy_password: str | None
 
     def __post_init__(self):
         self.reload_token()
@@ -52,8 +49,6 @@ class Config:
         hour, minute = list(map(int, (data.get('date') or input(
             'Enter date (12:00): ')).split(':')))
         delay = int(data.get('delay') or input('Enter delay: '))
-        proxy, user, password = data.get('proxy'), data.get(
-            'proxy_user'), data.get('proxy_password')
         return cls(
             data,
             data.get('token'),
@@ -64,7 +59,4 @@ class Config:
             hour,
             minute,
             delay,
-            proxy,
-            user,
-            password
         )
