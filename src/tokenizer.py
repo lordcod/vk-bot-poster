@@ -14,20 +14,10 @@ def check_url(url: str) -> bool:
 
 
 def get_page(config: Config):
-    if config.proxy:
-        proxy = {
-            'server': config.proxy,
-            'username': config.proxy_user,
-            'password': config.proxy_password
-        }
-    else:
-        proxy = None
-
     playwright = sync_playwright().start()
     browser = playwright.chromium.launch(
         headless=False,
-        channel='chrome',
-        proxy=proxy
+        channel='chrome'
     )
     page = browser.new_page()
     return page
