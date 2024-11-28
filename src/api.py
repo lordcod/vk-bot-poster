@@ -1,5 +1,6 @@
 import vk_api
-from vk_api import VkUpload
+from datetime import datetime
+from vk_api import VkUpload, ApiError
 
 
 class WallPosterApi:
@@ -8,12 +9,23 @@ class WallPosterApi:
         self.vk = self.vk_session.get_api()
         self.group_id = group_id
 
+    def is_valid(self) -> bool:
+        try:
+            self.vk.account.get_info()
+        except ApiError:
+            return False
+        else:
+            return True
+
     def upload_photo(self, filename: str) -> dict:
         upload = VkUpload(self.vk_session)
         photo = upload.photo_wall(photos=filename)[0]
         return photo
 
-    def post_wall(self, text: str, filename: str) -> int:
+    def get_time(self) -> None:
+        pass
+
+    def post_wall(self, datetime: datetime, text: str, filename: str) -> int:
         photo = self.upload_photo(filename)
         post = self.vk.wall.post(
             message=text,
@@ -24,6 +36,7 @@ class WallPosterApi:
             signed=0,
             from_group=1,
             ref="group_from_plus",
-            entry_point="group"
+            entry_point="group",
+            publish_date=int(datetime.timestamp())
         )
         return post['post_id']

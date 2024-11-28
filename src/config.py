@@ -2,33 +2,39 @@ from dataclasses import dataclass
 import yaml
 import os
 from pathlib import Path
-from .tokenizer import get_token
 
 PARENT_PATH = Path(__file__).parent.parent
 CONFIG_PATH = os.path.join(PARENT_PATH, 'config.yaml')
 IMAGES_PATH = os.path.join(PARENT_PATH, 'images')
 
-def deploy_token(data: dict):
-    token = data.get('token')
-    if token:
-        return token
 
-    phone, password = str(data.get('phone', '')), str(data.get('password', ''))
-    if not phone:
-        phone = input('Enter phone: ')
-    if not password:
-        password = input('Enter password: ')
-    return get_token(phone, password)
+def deploy_token(data: 'Config', reload: bool = False):
+    from .tokenizer import get_token
+    if data.token and not reload:
+        return data.token
+    return get_token(data)
 
 
 @dataclass
 class Config:
+    data: dict
     token: str
     message: str
     group_id: int
+    phone: str
+    password: str
     hour: int
     minute: int
     delay: int
+    proxy: str | None
+    proxy_user: str | None
+    proxy_password: str | None
+
+    def __post_init__(self):
+        self.reload_token()
+
+    def reload_token(self, reload: bool = False):
+        self.token = deploy_token(self, reload)
 
     @classmethod
     def load(cls) -> 'Config':
@@ -37,17 +43,28 @@ class Config:
                 data = yaml.safe_load(file)
         except Exception:
             data = {}
-        
+
         message = str(data.get('message')) or input('Enter message: ')
         group_id = int(data.get('group_id') or input('Enter group id: '))
-        hour, minute = (data.get('date') or input(
-            'Enter date (12:00): ')).split(':')
+        phone = str(data.get('phone', '')) or input('Enter phone: ')
+        password = str(
+            data.get('password', '')) or input('Enter password: ')
+        hour, minute = list(map(int, (data.get('date') or input(
+            'Enter date (12:00): ')).split(':')))
         delay = int(data.get('delay') or input('Enter delay: '))
+        proxy, user, password = data.get('proxy'), data.get(
+            'proxy_user'), data.get('proxy_password')
         return cls(
-            deploy_token(data),
+            data,
+            data.get('token'),
             message,
             group_id,
+            phone,
+            password,
             hour,
             minute,
-            delay
+            delay,
+            proxy,
+            user,
+            password
         )
