@@ -35,6 +35,7 @@ def get_token(phone, password):
     page.click('//button[@type="submit"]')
 
     page.wait_for_url(check_url)
+    page.close()
     return parse_url(page.url)
 
 

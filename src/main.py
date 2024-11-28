@@ -6,11 +6,15 @@ from .api import WallPosterApi
 from .config import Config, IMAGES_PATH
 
 
+last_sended_time = None
+
 
 def get_sender(wpa: WallPosterApi, msg: str):
     def send(image: str):
+        global last_sended_time
         logger.info(f'Send post {msg}: {image}')
         wpa.post_wall(msg, image)
+        last_sended_time = datetime.today()
     return send
 
 
@@ -22,6 +26,8 @@ def check_time(hour, minute, last: datetime):
         and hour >= last.hour
         and today.minute >= minute
         and minute >= last.minute
+        and (not last_sended_time
+             or (today-last_sended_time).total_seconds() >= 60)
     ):
         return True, None
     return False, today
@@ -52,11 +58,15 @@ def main():
     config = Config.load()
     wpa = WallPosterApi(config.token, config.group_id)
     send = get_sender(wpa, config.message)
-    for i, filename in enumerate(os.listdir(IMAGES_PATH)):
+    files = os.listdir(IMAGES_PATH)
+    for i, filename in enumerate(files):
         if i >= 50:
             if not accept():
                 return
         wait_for(config.hour, config.minute, config.delay)
         path = os.path.join(IMAGES_PATH, filename)
         send(path)
+        # if len(files) > i:
+        #     logger.debug("One minute delay!")
+        #     time.sleep(60)
     logger.warning("The images are over!")
