@@ -34,9 +34,10 @@ def get_token(config: Config):
     page.fill('//input[@name="password"]', config.password)
     page.click('//button[@type="submit"]')
 
-    code = input("Enter 2FA Code: ")
-    page.fill('//input[@name="otp"]', code)
-    page.click('//button[@type="submit"]')
+    if 'id.vk.com' in page.url:
+        code = input("Enter 2FA Code: ")
+        page.fill('//input[@name="otp"]', code)
+        page.click('//button[@type="submit"]')
 
     page.wait_for_url(check_url)
     page.close()

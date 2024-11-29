@@ -4,6 +4,7 @@ from loguru import logger
 from .api import WallPosterApi
 from .config import Config, IMAGES_PATH
 
+
 def get_sender(wpa: WallPosterApi, msg: str):
     def send(datetime: datetime, image: str):
         logger.info(f'Send post {msg}: {image}')
@@ -31,6 +32,6 @@ def main():
     files = os.listdir(IMAGES_PATH)
     files.sort()
     for i, filename in enumerate(files, start=1):
-        path = os.path.join(IMAGES_PATH, filename)
+        path = os.path.join(IMAGES_PATH, str(i)+'.'+filename.split('.')[-1])
         send(time_now + timedelta(days=i), path)
     logger.warning("The images are over!")
