@@ -10,8 +10,8 @@ token: "vk1.a.XXXXXX"
 phone: +79XXXX
 ppasword: XXXXX
 
-# Идентификатор группы (в ссылке на группу https://vk.com/clubXXXXX)
-group_id: 222485128
+# Идентификатор группы (в ссылке на группу https://vk.com/clubXXXXX, либо никнейм группы)
+group_id: vkapiposter
 
 # Сообщение при отправке (если не нужно, оставить пустым)
 message: ""

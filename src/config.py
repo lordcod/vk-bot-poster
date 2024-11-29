@@ -33,6 +33,10 @@ class Config:
     def reload_token(self, reload: bool = False):
         self.token = deploy_token(self, reload)
 
+    def dump(self):
+        with open(CONFIG_PATH, 'w+') as file:
+            yaml.safe_dump(self.data, file)
+
     @classmethod
     def load(cls) -> 'Config':
         try:
@@ -42,7 +46,7 @@ class Config:
             data = {}
 
         message = str(data.get('message')) or input('Enter message: ')
-        group_id = int(data.get('group_id') or input('Enter group id: '))
+        group_id = str(data.get('group_id') or input('Enter group id: '))
         phone = str(data.get('phone', '')) or input('Enter phone: ')
         password = str(
             data.get('password', '')) or input('Enter password: ')

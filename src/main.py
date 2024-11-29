@@ -4,10 +4,6 @@ from loguru import logger
 from .api import WallPosterApi
 from .config import Config, IMAGES_PATH
 
-
-last_sended_time = None
-
-
 def get_sender(wpa: WallPosterApi, msg: str):
     def send(datetime: datetime, image: str):
         logger.info(f'Send post {msg}: {image}')
@@ -33,6 +29,7 @@ def main():
     )
     send = get_sender(wpa, config.message)
     files = os.listdir(IMAGES_PATH)
+    files.sort()
     for i, filename in enumerate(files, start=1):
         path = os.path.join(IMAGES_PATH, filename)
         send(time_now + timedelta(days=i), path)

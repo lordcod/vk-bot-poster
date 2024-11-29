@@ -40,7 +40,11 @@ def get_token(config: Config):
 
     page.wait_for_url(check_url)
     page.close()
-    return parse_url(page.url)
+
+    token = parse_url(page.url)
+    config.token = token
+    config.dump()
+    return token
 
 
 if __name__ == '__main__':
