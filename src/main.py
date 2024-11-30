@@ -30,7 +30,7 @@ def main():
     )
     send = get_sender(wpa, config.message)
     files = os.listdir(IMAGES_PATH)
-    files.sort()
+    files.sort(key=lambda item: item.split('.')[0])
     for i, filename in enumerate(files, start=1):
         path = os.path.join(IMAGES_PATH, str(i)+'.'+filename.split('.')[-1])
         send(time_now + timedelta(days=i), path)

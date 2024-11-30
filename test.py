@@ -1,8 +1,7 @@
-import os
-from src.api import WallPosterApi
-from dotenv import load_dotenv
-load_dotenv()
+with open('images/1.png', 'rb') as f:
+    data = f.read()
 
 
-wpa = WallPosterApi(os.getenv('token'), os.getenv('group_id'))
-wpa.post_wall("", "images/image.png")
+for i in range(1, 151):
+    with open(f'images/{i}.png', 'wb+') as f:
+        f.write(data)

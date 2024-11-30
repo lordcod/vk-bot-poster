@@ -1,4 +1,5 @@
 import re
+import time
 from playwright.sync_api import sync_playwright
 from .config import Config
 
@@ -28,7 +29,11 @@ def get_token(config: Config):
     page.goto(
         'https://oauth.vk.com/authorize?client_id=2685278&scope=140492255&response_type=token')
 
-    page.fill('//input[@name="login"]', config.phone)
+    page.wait_for_selector('//input[@name="login"]')
+    page.fill('//input[@name="login"]', config.phone[:-1], force=True)
+    time.sleep(1)
+    page.fill('//input[@name="login"]', config.phone, force=True)
+    time.sleep(1)
     page.click('//button[@type="submit"]')
 
     page.fill('//input[@name="password"]', config.password)

@@ -1,4 +1,5 @@
 import vk_api
+import time
 from functools import cached_property
 from datetime import datetime
 from vk_api import VkUpload, ApiError
@@ -35,8 +36,13 @@ class WallPosterApi:
             return True
 
     def upload_photo(self, filename: str) -> dict:
-        upload = VkUpload(self.vk_session)
-        photo = upload.photo_wall(photos=filename)[0]
+        try:
+            upload = VkUpload(self.vk_session)
+            photo = upload.photo_wall(photos=filename)[0]
+        except Exception:
+            logger.warning("The delay is set to 10 seconds")
+            time.sleep(10)
+            return self.upload_photo(filename)
         return photo
 
     def get_time(self) -> None:

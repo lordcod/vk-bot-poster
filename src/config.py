@@ -34,6 +34,7 @@ class Config:
         self.token = deploy_token(self, reload)
 
     def dump(self):
+        return
         with open(CONFIG_PATH, 'w+') as file:
             yaml.safe_dump(self.data, file)
 
