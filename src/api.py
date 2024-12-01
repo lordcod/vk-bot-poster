@@ -40,9 +40,14 @@ class WallPosterApi:
         try:
             upload = VkUpload(self.vk_session)
             photo = upload.photo_wall(photos=filename)[0]
-        except ApiError:
-            logger.warning("The delay is set to 10 seconds")
-            time.sleep(10)
+        except Exception as exc:
+            if isinstance(exc, ApiError):
+                print(exc)
+                print(exc.error)
+            else:
+                print(exc)
+            logger.warning("The delay is set to 1 seconds")
+            time.sleep(1)
             return self.upload_photo(filename)
         return photo
 
@@ -72,7 +77,7 @@ class WallPosterApi:
             )
         except ApiError as exc:
             if exc.error['error_code'] != 14:
-                logger.exception('Api Error')
+                logger.exception(f'Api Error {exc.error}')
                 return None
             kwargs.update(self.send_captcha(exc))
             return self.post_wall(datetime, text, filename, **kwargs)
