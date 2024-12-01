@@ -1,7 +1,28 @@
-with open('images/1.png', 'rb') as f:
-    data = f.read()
+import yaml
+import vk_api
+from vk_api import ApiError, Captcha
+
+with open('config.yaml', 'rb') as f:
+    data = yaml.safe_load(f)
+    token = data['token']
 
 
-for i in range(1, 151):
-    with open(f'images/{i}.png', 'wb+') as f:
-        f.write(data)
+vk_session = vk_api.VkApi(token=token)
+vk = vk_session.get_api()
+
+
+def send_captcha(exc: Captcha) -> dict:
+    code = input(exc.get_url()+'  : ')
+    return exc.try_again(code)
+
+
+def send(**kwargs):
+    try:
+        d = vk.captcha.force(uid=66748, **kwargs)
+    except Captcha as exc:
+        exc.url
+        return
+    print(d)
+
+
+send()

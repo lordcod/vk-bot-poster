@@ -3,6 +3,8 @@ import time
 from playwright.sync_api import sync_playwright
 from .config import Config
 
+pw = None
+
 
 def parse_url(url: str) -> str:
     pattern = 'https://oauth.vk.com/blank.html#access_token=(.+)&user_id=(.+)'
@@ -14,8 +16,15 @@ def check_url(url: str) -> bool:
     return url.startswith('https://oauth.vk.com/blank.html#access_token=')
 
 
+def get_pw():
+    global pw
+    if pw is None:
+        pw = sync_playwright().start()
+    return pw
+
+
 def get_page():
-    playwright = sync_playwright().start()
+    playwright = get_pw()
     browser = playwright.chromium.launch(
         headless=False,
         channel='chrome'
@@ -26,7 +35,7 @@ def get_page():
 
 def get_captcha(img_captcha: str) -> str:
     page = get_page()
-    page.go_back(img_captcha)
+    page.goto(img_captcha)
     code = input('Enter captcha code: ')
     page.close()
     return code
@@ -54,6 +63,7 @@ def get_token(config: Config):
 
     page.wait_for_url(check_url)
     page.close()
+    page.context.close()
 
     token = parse_url(page.url)
     config.token = token
