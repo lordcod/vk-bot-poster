@@ -14,7 +14,7 @@ def check_url(url: str) -> bool:
     return url.startswith('https://oauth.vk.com/blank.html#access_token=')
 
 
-def get_page(config: Config):
+def get_page():
     playwright = sync_playwright().start()
     browser = playwright.chromium.launch(
         headless=False,
@@ -24,8 +24,16 @@ def get_page(config: Config):
     return page
 
 
+def get_captcha(img_captcha: str) -> str:
+    page = get_page()
+    page.go_back(img_captcha)
+    code = input('Enter captcha code: ')
+    page.close()
+    return code
+
+
 def get_token(config: Config):
-    page = get_page(config)
+    page = get_page()
     page.goto(
         'https://oauth.vk.com/authorize?client_id=2685278&scope=140492255&response_type=token')
 

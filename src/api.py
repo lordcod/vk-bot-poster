@@ -4,6 +4,7 @@ from functools import cached_property
 from datetime import datetime
 from vk_api import VkUpload, ApiError
 from loguru import logger
+from .tokenizer import get_captcha
 
 
 class WallPosterApi:
@@ -39,16 +40,21 @@ class WallPosterApi:
         try:
             upload = VkUpload(self.vk_session)
             photo = upload.photo_wall(photos=filename)[0]
-        except Exception:
+        except ApiError:
             logger.warning("The delay is set to 10 seconds")
             time.sleep(10)
             return self.upload_photo(filename)
         return photo
 
-    def get_time(self) -> None:
-        pass
+    def send_captcha(self, exc: ApiError) -> dict:
+        logger.warning("Waiting for a captcha!")
+        code = get_captcha(exc.error['captcha_img'])
+        return {
+            'captcha_sid': exc.error['captcha_sid'],
+            'captcha_key': code
+        }
 
-    def post_wall(self, datetime: datetime, text: str, filename: str) -> int:
+    def post_wall(self, datetime: datetime, text: str, filename: str, **kwargs) -> int:
         photo = self.upload_photo(filename)
         try:
             post = self.vk.wall.post(
@@ -61,9 +67,13 @@ class WallPosterApi:
                 from_group=1,
                 ref="group_from_plus",
                 entry_point="group",
-                publish_date=int(datetime.timestamp())
+                publish_date=int(datetime.timestamp()),
+                **kwargs
             )
-        except Exception:
-            logger.exception('Api Error')
-            return None
+        except ApiError as exc:
+            if exc.error['error_code'] != 14:
+                logger.exception('Api Error')
+                return None
+            kwargs.update(self.send_captcha(exc))
+            return self.post_wall(datetime, text, filename, **kwargs)
         return post['post_id']
