@@ -20,7 +20,6 @@ def send(**kwargs):
     try:
         d = vk.captcha.force(uid=66748, **kwargs)
     except Captcha as exc:
-        exc.url
         return
     print(d)
 

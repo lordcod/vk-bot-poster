@@ -40,22 +40,24 @@ class WallPosterApi:
         try:
             upload = VkUpload(self.vk_session)
             photo = upload.photo_wall(photos=filename)[0]
-        except Exception as exc:
+        except Exception:
             logger.warning("The delay is set to 10 seconds")
             time.sleep(10)
             return self.upload_photo(filename)
         return photo
 
-    def send_captcha(self, exc: Captcha) -> dict:
+    def send_captcha(self, exc: Captcha, code: str | None = None) -> dict:
         logger.warning("Waiting for a captcha!")
-        code = get_captcha(exc.get_url())
+        if code is None:
+            code = get_captcha(exc.get_url())
         try:
             return exc.try_again(code)
         except ApiError:
             logger.warning("The delay is set to 10 seconds")
             time.sleep(10)
-            return self.send_captcha(exc)
+            return self.send_captcha(exc, code)
         except Captcha as exc:
+            logger.warning("Incorrect captcha!")
             return self.send_captcha(exc)
 
     def post_wall(self, datetime: datetime, text: str, filename: str):
