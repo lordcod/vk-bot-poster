@@ -79,4 +79,5 @@ class WallPosterApi:
             return self.send_captcha(exc)
         except ApiError as exc:
             logger.exception(f'Api Error {exc.error}')
+            return
         return post
